@@ -74,5 +74,7 @@ func (dr *DataReceiver) WsReceiveLoop() {
 		if err := dr.prod.ProduceData(data); err != nil {
 			fmt.Println("kafka producer err:", err)
 		}
+
+		
 	}
 }
