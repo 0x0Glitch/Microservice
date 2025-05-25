@@ -1,31 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/0x0Glitch/toll-calculator/types"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/gorilla/websocket"
 )
-
+var kafkaTopic = "obudata"
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1028,
 	WriteBufferSize: 1028,
 }
 
-
 type DataReceiver struct {
 	msg  chan types.OBUData
 	conn *websocket.Conn
-	prod *kafka.Producer
+	prod DataProducer
 }
-
-
-var kafkaTopic = "obudata"
-
 
 
 func main() {
@@ -33,55 +26,32 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.HandleFunc("/ws", recv.wsHandler)
+	http.HandleFunc("/ws", recv.WsHandler)
 	http.ListenAndServe(":30000", nil)
 }
 
-
+func (dr *DataReceiver) produceData(data types.OBUData) error {
+	return dr.prod.ProduceData(data)
+}
 
 func NewDataReciever() (*DataReceiver, error) {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
+	var (
+		p DataProducer
+		err error
+	)
+
+	p, err = NewKafkaProducer(kafkaTopic)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	// start another go routine to check if we have delivered the data
-	go func() {
-		for e := range p.Events() {
-			switch ev := e.(type) {
-			case *kafka.Message:
-				if ev.TopicPartition.Error != nil {
-					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
-				} else {
-					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
-				}
-			}
-		}
-	}()
+	p = NewLogMiddleware(p)
 	return &DataReceiver{
 		msg:  make(chan types.OBUData, 128),
 		prod: p,
 	}, nil
 }
 
-
-
-func (dr *DataReceiver) produceData(data types.OBUData) error {
-	b, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	err = dr.prod.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &kafkaTopic,
-			Partition: kafka.PartitionAny},
-		Value: b,
-	}, nil)
-	return err
-}
-
-
-
-func (dr *DataReceiver) wsHandler(w http.ResponseWriter,r *http.Request) {
+func (dr *DataReceiver) WsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("New OBU connected!")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -89,22 +59,19 @@ func (dr *DataReceiver) wsHandler(w http.ResponseWriter,r *http.Request) {
 		return
 	}
 	dr.conn = conn
-	go dr.wsReceiveLoop() 
+	go dr.WsReceiveLoop()
 
 }
 
-
-
-
-func (dr *DataReceiver) wsReceiveLoop() {
+func (dr *DataReceiver) WsReceiveLoop() {
 	for {
 		var data types.OBUData
 		if err := dr.conn.ReadJSON(&data); err != nil {
 			log.Println("read error:", err)
 			continue
 		}
-		fmt.Printf("data is %+v\n",data)
-		if err := dr.produceData(data); err != nil {
+		fmt.Printf("data is %+v\n", data)
+		if err := dr.prod.ProduceData(data); err != nil {
 			fmt.Println("kafka producer err:", err)
 		}
 	}
