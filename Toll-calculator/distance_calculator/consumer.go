@@ -52,10 +52,11 @@ func (c *KafkaConsumer) readMessageLoop() {
 		}
 		distance,err := c.calcService.CalculateDistance(data)
 		if err != nil{
+			
 			logrus.Errorf("calculation error: %s",err)
 			continue
 
 		}
-		fmt.Printf("distance %.2f\n\n",distance)
+		_ = distance
 	}
 }

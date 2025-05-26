@@ -16,6 +16,8 @@ func NewLogMiddleware(next DataProducer) *LogMiddleware {
 		next: next,
 	}
 }
+
+
 func (l *LogMiddleware) ProduceData(data types.OBUData) error {
 	
 	defer func(start time.Time) {

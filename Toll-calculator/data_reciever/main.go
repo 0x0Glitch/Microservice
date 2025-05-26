@@ -30,9 +30,11 @@ func main() {
 	http.ListenAndServe(":30000", nil)
 }
 
+
 func (dr *DataReceiver) produceData(data types.OBUData) error {
 	return dr.prod.ProduceData(data)
 }
+
 
 func NewDataReciever() (*DataReceiver, error) {
 	var (
@@ -44,12 +46,14 @@ func NewDataReciever() (*DataReceiver, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	p = NewLogMiddleware(p)
 	return &DataReceiver{
 		msg:  make(chan types.OBUData, 128),
 		prod: p,
 	}, nil
 }
+
 
 func (dr *DataReceiver) WsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("New OBU connected!")
@@ -63,6 +67,7 @@ func (dr *DataReceiver) WsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
 func (dr *DataReceiver) WsReceiveLoop() {
 	for {
 		var data types.OBUData
@@ -74,7 +79,6 @@ func (dr *DataReceiver) WsReceiveLoop() {
 		if err := dr.prod.ProduceData(data); err != nil {
 			fmt.Println("kafka producer err:", err)
 		}
-
-		
 	}
 }
+

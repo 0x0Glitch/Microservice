@@ -52,5 +52,4 @@ func (p *kafkaProducer) ProduceData(data types.OBUData) error {
 			Partition: kafka.PartitionAny},
 		Value: b,
 	}, nil)
-
 }
