@@ -4,13 +4,16 @@ import "github.com/0x0Glitch/toll-calculator/types"
 
 
 type MemoryStore struct{
-
+	data map[int]float64
 }
 
 func NewMemoryStore() *MemoryStore{
-	return &MemoryStore{}
+	return &MemoryStore{
+		data:make(map[int]float64),
+	}
 }
 
 func (m *MemoryStore) Insert(d types.Distance) error{
+	m.data[d.OBUID] += d.Values
 	return nil
 }

@@ -12,4 +12,4 @@ agg:
 	@go build -o bin/agg ./aggregator
 	@./bin/agg
 	
-.PHONY: obu, invoicer
+.PHONY: obu invoicer
