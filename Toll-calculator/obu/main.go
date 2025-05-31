@@ -58,3 +58,9 @@ func generateOBUIDS(n int) []int {
 	}
 	return ids
 }
+
+// func init(){
+// 	x := types.Test{
+// 		Someint: 40,
+// 	}
+// }

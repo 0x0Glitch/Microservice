@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package types;
+
+
+option go_package = "github.com/0x0Glitch/tolling/types;types";
+
+service Aggregator {
+  rpc Aggregate(AggregatorRequest) returns (Empty);
+}
+
+
+message Empty {}
+
+
+message AggregatorRequest {
+  int32 ObuID    = 1;  // renamed to snake_case
+  double Value    = 2;  // added “= 2;”
+  int64 Unix = 3;  // swapped type/name so follows “type name = N” syntax
+}
