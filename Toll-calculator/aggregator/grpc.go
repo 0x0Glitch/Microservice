@@ -19,7 +19,7 @@ func NewAggregatorGRPCServer(svc Aggregator) *GRPCAggregatorServer {
 // Aggregate implements the Aggregate RPC method from the protobuf definition
 func (s *GRPCAggregatorServer) Aggregate(ctx context.Context, req *types.AggregatorRequest) (*types.Empty, error) {
 	distance := types.Distance{
-		OBUID:  int(req.ObuID),
+		OBUID:  uint64(req.ObuID),
 		Values: req.Value,
 		Unix:   req.Unix,
 	}

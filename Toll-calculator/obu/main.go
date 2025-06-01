@@ -51,10 +51,10 @@ func main() {
 
 }
 
-func generateOBUIDS(n int) []int {
-	ids := make([]int, n)
+func generateOBUIDS(n int) []uint64 {
+	ids := make([]uint64, n)
 	for i := 0; i < n; i++ {
-		ids[i] = rand.Intn(math.MaxInt)
+		ids[i] = uint64(rand.Intn(math.MaxInt))
 	}
 	return ids
 }

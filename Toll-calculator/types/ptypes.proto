@@ -12,6 +12,9 @@ service Aggregator {
 
 message Empty {}
 
+message GetInvoiceRequest{
+  uint64 ObuID = 1;
+}
 
 message AggregatorRequest {
   int32 ObuID    = 1;  // renamed to snake_case

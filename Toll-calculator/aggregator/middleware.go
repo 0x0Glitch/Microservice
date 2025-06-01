@@ -27,7 +27,7 @@ func (m *LogMiddleware) AggregateDistance(distance types.Distance) (err error) {
 	return
 }
 
-func (m *LogMiddleware) CalculateInvoice(obuID int) (inv *types.Invoice, err error) {
+func (m *LogMiddleware) CalculateInvoice(obuID uint64) (inv *types.Invoice, err error) {
 	defer func(start time.Time) {
 
 		var (

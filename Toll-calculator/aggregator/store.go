@@ -8,12 +8,12 @@ import (
 
 
 type MemoryStore struct{
-	data map[int]float64
+	data map[uint64]float64
 }
 
 func NewMemoryStore() *MemoryStore{
 	return &MemoryStore{
-		data:make(map[int]float64),
+		data:make(map[uint64]float64),
 	}
 }
 
@@ -22,10 +22,10 @@ func (m *MemoryStore) Insert(d types.Distance) error{
 	return nil
 }
 
-func (m *MemoryStore) Get(id int) (float64,error){
+func (m *MemoryStore) Get(id uint64) (float64,error){
 	dist,ok := m.data[id]
 	if !ok{
-		return 0.0,fmt.Errorf("Couldn't find distance for id: %d",id)
+		return 0.0,fmt.Errorf("couldn't find distance for id: %d",id)
 	}
 	return dist,nil
 }

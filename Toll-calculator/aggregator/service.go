@@ -8,12 +8,12 @@ import (
 
 type Aggregator interface {
 	AggregateDistance(types.Distance) error
-	CalculateInvoice(int) (*types.Invoice,error)
+	CalculateInvoice(uint64) (*types.Invoice,error)
 }
 
 type Storer interface {
 	Insert(types.Distance) error
-	Get(int) (float64,error)
+	Get(uint64) (float64,error)
 }
 
 type InvoiceAggregator struct {
@@ -34,7 +34,7 @@ func (i *InvoiceAggregator) AggregateDistance(distance types.Distance) error {
 }
 
 
-func (i *InvoiceAggregator) CalculateInvoice(obuID int) (*types.Invoice,error) {
+func (i *InvoiceAggregator) CalculateInvoice(obuID uint64) (*types.Invoice,error) {
 	dist,err := i.store.Get(obuID)
 	if err != nil{
 		return nil,err
@@ -42,7 +42,7 @@ func (i *InvoiceAggregator) CalculateInvoice(obuID int) (*types.Invoice,error) {
 	inv := &types.Invoice{
 		OBUID: obuID,
 		TotalDistance: dist,
-		Amount: basePrice*basePrice,
+		Amount: basePrice*dist,
 	}
 	return inv,nil
 }

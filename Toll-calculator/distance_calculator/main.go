@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -15,11 +16,15 @@ const kafkaTopic = "obudata"
 func main() {
 	var (
 		svc CalculatorServicer
+		aggregateEndpoint = "http://127.0.0.1:3000"
 	)
+	// httplistenAddr := flag.String("httplistenaddr", ":3001", "the listen address of the gRPC server")
+	flag.Parse()
 	svc = NewCalculatorService()
 	svc = NewLogMiddleware(svc)
+	c := client.NewHTTPClient(aggregateEndpoint)
 	
-	KafkaConsumer, err := NewKafkaConsumer(kafkaTopic,svc,client.NewHTTPClient("http://127.0.0.1:3000/aggregate"))
+	KafkaConsumer, err := NewKafkaConsumer(kafkaTopic, svc,c)
 	if err != nil {
 		log.Fatal(err)
 	}

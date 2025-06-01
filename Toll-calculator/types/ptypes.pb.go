@@ -57,6 +57,50 @@ func (*Empty) Descriptor() ([]byte, []int) {
 	return file_types_ptypes_proto_rawDescGZIP(), []int{0}
 }
 
+type GetInvoiceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ObuID         uint64                 `protobuf:"varint,1,opt,name=ObuID,proto3" json:"ObuID,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInvoiceRequest) Reset() {
+	*x = GetInvoiceRequest{}
+	mi := &file_types_ptypes_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInvoiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInvoiceRequest) ProtoMessage() {}
+
+func (x *GetInvoiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_types_ptypes_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInvoiceRequest.ProtoReflect.Descriptor instead.
+func (*GetInvoiceRequest) Descriptor() ([]byte, []int) {
+	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetInvoiceRequest) GetObuID() uint64 {
+	if x != nil {
+		return x.ObuID
+	}
+	return 0
+}
+
 type AggregatorRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ObuID         int32                  `protobuf:"varint,1,opt,name=ObuID,proto3" json:"ObuID,omitempty"`  // renamed to snake_case
@@ -68,7 +112,7 @@ type AggregatorRequest struct {
 
 func (x *AggregatorRequest) Reset() {
 	*x = AggregatorRequest{}
-	mi := &file_types_ptypes_proto_msgTypes[1]
+	mi := &file_types_ptypes_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -80,7 +124,7 @@ func (x *AggregatorRequest) String() string {
 func (*AggregatorRequest) ProtoMessage() {}
 
 func (x *AggregatorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_types_ptypes_proto_msgTypes[1]
+	mi := &file_types_ptypes_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -93,7 +137,7 @@ func (x *AggregatorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AggregatorRequest.ProtoReflect.Descriptor instead.
 func (*AggregatorRequest) Descriptor() ([]byte, []int) {
-	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
+	return file_types_ptypes_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AggregatorRequest) GetObuID() int32 {
@@ -122,7 +166,9 @@ var File_types_ptypes_proto protoreflect.FileDescriptor
 const file_types_ptypes_proto_rawDesc = "" +
 	"\n" +
 	"\x12types/ptypes.proto\x12\x05types\"\a\n" +
-	"\x05Empty\"S\n" +
+	"\x05Empty\")\n" +
+	"\x11GetInvoiceRequest\x12\x14\n" +
+	"\x05ObuID\x18\x01 \x01(\x04R\x05ObuID\"S\n" +
 	"\x11AggregatorRequest\x12\x14\n" +
 	"\x05ObuID\x18\x01 \x01(\x05R\x05ObuID\x12\x14\n" +
 	"\x05Value\x18\x02 \x01(\x01R\x05Value\x12\x12\n" +
@@ -143,13 +189,14 @@ func file_types_ptypes_proto_rawDescGZIP() []byte {
 	return file_types_ptypes_proto_rawDescData
 }
 
-var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_types_ptypes_proto_goTypes = []any{
 	(*Empty)(nil),             // 0: types.Empty
-	(*AggregatorRequest)(nil), // 1: types.AggregatorRequest
+	(*GetInvoiceRequest)(nil), // 1: types.GetInvoiceRequest
+	(*AggregatorRequest)(nil), // 2: types.AggregatorRequest
 }
 var file_types_ptypes_proto_depIdxs = []int32{
-	1, // 0: types.Aggregator.Aggregate:input_type -> types.AggregatorRequest
+	2, // 0: types.Aggregator.Aggregate:input_type -> types.AggregatorRequest
 	0, // 1: types.Aggregator.Aggregate:output_type -> types.Empty
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
@@ -169,7 +216,7 @@ func file_types_ptypes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_ptypes_proto_rawDesc), len(file_types_ptypes_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
