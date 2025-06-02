@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"math/rand"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 
 const wsEndpoint = "ws://127.0.0.1:30000/ws"
 
-var sendInterval = time.Second*5
+var sendInterval = time.Second * 5
 
 func genLatLong() (float64, float64) {
 	return genCoord(), genCoord()
@@ -31,7 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	for {
 		for i := 0; i < len(obuIDS); i++ {
 			lat, long := genLatLong()
@@ -51,10 +50,10 @@ func main() {
 
 }
 
-func generateOBUIDS(n int) []uint64 {
-	ids := make([]uint64, n)
+func generateOBUIDS(n int) []int32 {
+	ids := make([]int32, n)
 	for i := 0; i < n; i++ {
-		ids[i] = uint64(rand.Intn(math.MaxInt))
+		ids[i] = int32(rand.Intn(999999))
 	}
 	return ids
 }

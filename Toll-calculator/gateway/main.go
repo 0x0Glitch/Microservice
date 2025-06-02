@@ -38,7 +38,7 @@ func newInvoiceHandler(c client.Client) *InvoiceHandler{
 func (h *InvoiceHandler) handleGetInvoice(w http.ResponseWriter, r *http.Request) error {
 	// return fmt.Errorf("Something went wrong")
 	// access agg client
-	inv, err := h.client.GetInvoice(context.Background(),495)
+	inv, err := h.client.GetInvoice(context.Background(),1669557248)
 	if err != nil{
 		return err
 	}

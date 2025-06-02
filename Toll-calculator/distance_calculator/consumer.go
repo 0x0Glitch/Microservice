@@ -65,7 +65,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 			Unix:   time.Now().UnixNano(),
 			ObuID:  int32(data.OBUID),
 		}
-		if err := c.aggClient.Aggregate(context.Background(),req); err != nil {
+		if err := c.aggClient.Aggregate(context.Background(),&req); err != nil {
 			logrus.Error("aggregate error:", err)
 			continue
 		}

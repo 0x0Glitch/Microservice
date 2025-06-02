@@ -59,7 +59,7 @@ func (*Empty) Descriptor() ([]byte, []int) {
 
 type GetInvoiceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ObuID         uint64                 `protobuf:"varint,1,opt,name=ObuID,proto3" json:"ObuID,omitempty"`
+	ObuID         int32                  `protobuf:"varint,1,opt,name=ObuID,proto3" json:"ObuID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,7 +94,7 @@ func (*GetInvoiceRequest) Descriptor() ([]byte, []int) {
 	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetInvoiceRequest) GetObuID() uint64 {
+func (x *GetInvoiceRequest) GetObuID() int32 {
 	if x != nil {
 		return x.ObuID
 	}
@@ -168,7 +168,7 @@ const file_types_ptypes_proto_rawDesc = "" +
 	"\x12types/ptypes.proto\x12\x05types\"\a\n" +
 	"\x05Empty\")\n" +
 	"\x11GetInvoiceRequest\x12\x14\n" +
-	"\x05ObuID\x18\x01 \x01(\x04R\x05ObuID\"S\n" +
+	"\x05ObuID\x18\x01 \x01(\x05R\x05ObuID\"S\n" +
 	"\x11AggregatorRequest\x12\x14\n" +
 	"\x05ObuID\x18\x01 \x01(\x05R\x05ObuID\x12\x14\n" +
 	"\x05Value\x18\x02 \x01(\x01R\x05Value\x12\x12\n" +

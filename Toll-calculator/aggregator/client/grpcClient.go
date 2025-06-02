@@ -12,20 +12,22 @@ type GRPCClient struct {
 	client   types.AggregatorClient
 }
 
-func NewGRPCClient(Endpoint string) (*GRPCClient,error) {
+func NewGRPCClient(Endpoint string) (*GRPCClient, error) {
 
 	conn, err := grpc.Dial(Endpoint, grpc.WithInsecure())
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	c := types.NewAggregatorClient(conn)
 	return &GRPCClient{
 		Endpoint: Endpoint,
 		client:   c,
-	},nil
+	}, nil
 }
 
-func (c *GRPCClient) Aggregate(ctx context.Context, req types.AggregatorRequest) error {
-	_, err := c.client.Aggregate(ctx, &req)
+func (c *GRPCClient) Aggregate(ctx context.Context, req *types.AggregatorRequest) error {
+	_, err := c.client.Aggregate(ctx, req)
 	return err
 }
+
+

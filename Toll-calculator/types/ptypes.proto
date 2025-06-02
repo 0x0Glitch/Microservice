@@ -13,7 +13,7 @@ service Aggregator {
 message Empty {}
 
 message GetInvoiceRequest{
-  uint64 ObuID = 1;
+  int32 ObuID = 1;
 }
 
 message AggregatorRequest {

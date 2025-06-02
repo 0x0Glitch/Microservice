@@ -93,13 +93,13 @@ func handleGetInvoice(svc Aggregator) http.HandlerFunc {
 			return
 		}
 
-		obuID, err := strconv.ParseUint(values[0], 10, 64)
+		obuID, err := strconv.Atoi(values[0])
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid OBU ID"})
 			return
 		}
 
-		invoice, err := svc.CalculateInvoice(obuID)
+		invoice, err := svc.CalculateInvoice(int32(obuID))
 		if err != nil {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 			return
@@ -130,7 +130,7 @@ func handleAggregate(svc Aggregator) http.HandlerFunc {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
-		if err := svc.AggregateDistance(distance); err != nil {
+		if err := svc.AggregateDistance(&distance); err != nil {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 			return
 		}
