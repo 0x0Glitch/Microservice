@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/0x0Glitch/toll-calculator/types"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
@@ -22,6 +23,8 @@ func main() {
 	store := NewMemoryStore()
 
 	svc := NewInvoiceAggregator(store)
+
+	svc = NewMetricsMiddleware(svc)
 	svc = NewLogMiddleware(svc)
 
 	// Start gRPC server in a separate goroutine
@@ -81,6 +84,7 @@ func makeHTTPTransport(listenAddr string, svc Aggregator) {
 	fmt.Println("HTTP transport running on port:", listenAddr)
 	http.HandleFunc("/aggregate", handleAggregate(svc))
 	http.HandleFunc("/invoice", handleGetInvoice(svc))
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(listenAddr, nil)
 }
 
