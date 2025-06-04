@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/0x0Glitch/toll-calculator/types"
 )
 
@@ -27,12 +28,6 @@ func (s *GRPCAggregatorServer) Aggregate(ctx context.Context, req *types.Aggrega
 	return &types.Empty{}, err
 }
 
-// This method is not used by the gRPC service but might be used internally
-// func (s *GRPCAggregatorServer) AggregateDistance(req types.AggregatorRequest) error {
-// 	distance := types.Distance{
-// 		OBUID:  int(req.ObuID),
-// 		Values: req.Value,
-// 		Unix:   req.Unix,
-// 	}
-// 	return s.svc.AggregateDistance(distance)
-// }
+func (s *GRPCAggregatorServer) CalculateInvoice(ctx context.Context, req *types.Invoice) (*types.Invoice, error) {
+	return s.svc.CalculateInvoice(int32(req.OBUID))
+}

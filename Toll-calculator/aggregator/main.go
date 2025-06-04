@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/0x0Glitch/toll-calculator/types"
@@ -54,40 +53,18 @@ func main() {
 
 }
 
-func makeHTTPTransport(listenAddr string, svc Aggregator) {
-	fmt.Println("HTTP transport running on port:", listenAddr)
-	http.HandleFunc("/aggregate", handleAggregate(svc))
-	http.HandleFunc("/invoice", handleGetInvoice(svc))
+func makeHTTPTransport(listenAddr string, svc Aggregator) error {
+	aggMetricHandler := NewHTTPMetricHandler("aggregate")
+	invMetricHandler := NewHTTPMetricHandler("invoice")
+	aggregateHandler := makeHTTPHandlerFunc(aggMetricHandler.Instrument(handleAggregate(svc)))
+	invoiceHandler 	 := makeHTTPHandlerFunc(invMetricHandler.Instrument(handleGetInvoice(svc)))
+
+	http.HandleFunc("/aggregate", aggregateHandler)
+	http.HandleFunc("/invoice", invoiceHandler)
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(listenAddr, nil)
-}
 
-func handleGetInvoice(svc Aggregator) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
-			return
-		}
-		values, ok := r.URL.Query()["obu"]
-		// obuID := r.URL.Query()["obu"][0]
-		if !ok {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing OBU ID"})
-			return
-		}
-
-		obuID, err := strconv.Atoi(values[0])
-		if err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid OBU ID"})
-			return
-		}
-
-		invoice, err := svc.CalculateInvoice(int32(obuID))
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return
-		}
-		writeJSON(w, http.StatusOK, invoice)
-	}
+	fmt.Println("HTTP transport running on port:", listenAddr)
+	return http.ListenAndServe(listenAddr, nil)
 }
 
 func makeGRPCTransport(listenAddr string, svc Aggregator) error {
@@ -105,26 +82,8 @@ func makeGRPCTransport(listenAddr string, svc Aggregator) error {
 	return server.Serve(ln)
 }
 
-func handleAggregate(svc Aggregator) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var distance types.Distance
-		if err := json.NewDecoder(r.Body).Decode(&distance); err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
-			return
-		}
-		if err := svc.AggregateDistance(&distance); err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return
-		}
-	}
-}
-
 func writeJSON(rw http.ResponseWriter, status int, v any) error {
 	rw.WriteHeader(status)
 	rw.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(rw).Encode(v)
 }
-
-
-	
-
