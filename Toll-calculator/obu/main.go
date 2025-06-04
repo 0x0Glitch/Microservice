@@ -58,8 +58,8 @@ func generateOBUIDS(n int) []int32 {
 	return ids
 }
 
-// func init(){
-// 	x := types.Test{
-// 		Someint: 40,
+// func init() {
+// 	if err := godotenv.Load(); err != nil {
+// 		log.Fatal(err)
 // 	}
 // }

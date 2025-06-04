@@ -13,4 +13,4 @@ scrape_configs:
   follow_redirects: true
   static_configs:
   - targets:
-    - host.docker.internal:3000
+    - host.docker.internal:4000

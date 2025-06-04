@@ -2,27 +2,30 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/0x0Glitch/toll-calculator/types"
+	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	httplistenAddr := flag.String("httplistenaddr", ":3000", "the listen address of the HTTP server")
-	grpclistenAddr := flag.String("grpclistenaddr", ":3001", "the listen address of the gRPC server")
-	flag.Parse()
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 
 	store := NewMemoryStore()
-
 	svc := NewInvoiceAggregator(store)
+	grpcListenAddr := os.Getenv("AGG_GRPC_LISTEN_ADDR")
+	httpListenAddr := os.Getenv("AGG_HTTP_LISTEN_ADDR")
 
 	svc = NewMetricsMiddleware(svc)
 	svc = NewLogMiddleware(svc)
@@ -30,8 +33,8 @@ func main() {
 	// Start gRPC server in a separate goroutine
 	serverErrCh := make(chan error, 1)
 	go func() {
-		fmt.Println("Starting gRPC server on", *grpclistenAddr)
-		if err := makeGRPCTransport(*grpclistenAddr, svc); err != nil {
+		fmt.Println("Starting gRPC server on", grpcListenAddr)
+		if err := makeGRPCTransport(grpcListenAddr, svc); err != nil {
 			serverErrCh <- err
 		}
 	}()
@@ -47,37 +50,8 @@ func main() {
 	default:
 		// Server started successfully or is still starting
 	}
+	makeHTTPTransport(httpListenAddr, svc)
 
-	// Try to connect to the gRPC server with retries
-	// var c *client.GRPCClient
-	// var err error
-	// for i := 0; i < 5; i++ {
-	// 	fmt.Printf("Attempting to connect to gRPC server (attempt %d)...\n", i+1)
-	// 	c,err = client.NewGRPCClient(*grpclistenAddr)
-	// 	if err == nil {
-	// 		break
-	// 	}
-	// 	fmt.Printf("Connection attempt failed: %v. Retrying...\n", err)
-	// 	time.Sleep(time.Second)
-	// }
-
-	// if err != nil {
-	// 	log.Fatalf("Failed to connect to gRPC server after multiple attempts: %v", err)
-	// }
-
-	// fmt.Println("Successfully connected to gRPC server")
-
-	// // Send test request
-	// if _ = c.Aggregate(context.Background(), types.AggregatorRequest{
-	// 	ObuID: 1,
-	// 	Value: 58.55,
-	// 	Unix:  time.Now().UnixNano(),
-	// }); err != nil {
-	// 	log.Fatalf("Failed to send aggregate request: %v", err)
-	// }
-
-	makeHTTPTransport(*httplistenAddr, svc)
-	// fmt.Println("this is working fine")
 }
 
 func makeHTTPTransport(listenAddr string, svc Aggregator) {
@@ -90,6 +64,10 @@ func makeHTTPTransport(listenAddr string, svc Aggregator) {
 
 func handleGetInvoice(svc Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
+			return
+		}
 		values, ok := r.URL.Query()["obu"]
 		// obuID := r.URL.Query()["obu"][0]
 		if !ok {
@@ -146,3 +124,7 @@ func writeJSON(rw http.ResponseWriter, status int, v any) error {
 	rw.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(rw).Encode(v)
 }
+
+
+	
+
