@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/0x0Glitch/toll-calculator/types"
 	"github.com/gorilla/websocket"
 )
+
 var kafkaTopic = "obudata"
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1028,
@@ -20,7 +22,6 @@ type DataReceiver struct {
 	prod DataProducer
 }
 
-
 func main() {
 	recv, err := NewDataReciever()
 	if err != nil {
@@ -30,15 +31,13 @@ func main() {
 	http.ListenAndServe(":30000", nil)
 }
 
-
 func (dr *DataReceiver) produceData(data types.OBUData) error {
 	return dr.prod.ProduceData(data)
 }
 
-
 func NewDataReciever() (*DataReceiver, error) {
 	var (
-		p DataProducer
+		p   DataProducer
 		err error
 	)
 
@@ -54,7 +53,6 @@ func NewDataReciever() (*DataReceiver, error) {
 	}, nil
 }
 
-
 func (dr *DataReceiver) WsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("New OBU connected!")
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -67,10 +65,11 @@ func (dr *DataReceiver) WsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 func (dr *DataReceiver) WsReceiveLoop() {
 	for {
 		var data types.OBUData
+		reqID := rand.Intn(10000000)
+		data.RequestID = reqID
 		if err := dr.conn.ReadJSON(&data); err != nil {
 			log.Println("read error:", err)
 			continue
@@ -81,4 +80,3 @@ func (dr *DataReceiver) WsReceiveLoop() {
 		}
 	}
 }
-

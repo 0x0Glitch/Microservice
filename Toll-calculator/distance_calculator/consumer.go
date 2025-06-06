@@ -42,6 +42,13 @@ func (c *KafkaConsumer) Start() {
 	c.isRunning = true
 	c.readMessageLoop()
 }
+
+
+func (c *KafkaConsumer) Stop() {
+	c.isRunning = false
+	c.consumer.Close()
+}
+
 func (c *KafkaConsumer) readMessageLoop() {
 	for c.isRunning {
 		msg, err := c.consumer.ReadMessage(-1)
@@ -53,6 +60,10 @@ func (c *KafkaConsumer) readMessageLoop() {
 		var data types.OBUData
 		if err := json.Unmarshal(msg.Value, &data); err != nil {
 			logrus.Errorf("JSON serialization error: %s", err)
+			logrus.WithFields(logrus.Fields{
+				"error": err,
+				"requestID": data.RequestID,
+			}).Info("failed to unmarshal message")
 			continue
 		}
 		distance, err := c.calcService.CalculateDistance(data)
@@ -64,6 +75,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 			Value: distance,
 			Unix:   time.Now().UnixNano(),
 			ObuID:  int32(data.OBUID),
+			
 		}
 		if err := c.aggClient.Aggregate(context.Background(),&req); err != nil {
 			logrus.Error("aggregate error:", err)

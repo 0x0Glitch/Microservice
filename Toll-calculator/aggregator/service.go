@@ -22,6 +22,7 @@ type InvoiceAggregator struct {
 
 const basePrice = 315
 
+
 func NewInvoiceAggregator(store Storer) Aggregator {
 	return &InvoiceAggregator{
 		store: store,
