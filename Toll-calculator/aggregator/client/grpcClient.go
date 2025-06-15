@@ -29,5 +29,3 @@ func (c *GRPCClient) Aggregate(ctx context.Context, req *types.AggregatorRequest
 	_, err := c.client.Aggregate(ctx, req)
 	return err
 }
-
-
